@@ -1,0 +1,26 @@
+{% for date, points in history %}
+    <div id="table_{{ date }}" data-id="{{ date }}" class="table-container" style="display:{% if loop.first %}block;{% else %}none;{% endif %}">
+        <table class="table table-striped table-condensed table-bordered">
+            <caption>{{ normalize_date(date) }}</caption>
+            <thead>
+                <tr>
+                    <th width="50%">Время</th>
+                    <th>СК</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for point in points %}
+                    <tr class="{% if range_min <= point[1] <= range_max %}success{% else %}danger{% endif %}" {% if point[2] %}title="ручное измерение"{% endif %}>
+                        <td>{% if point[2] %}+ {% else %}&nbsp;&nbsp;&nbsp;{% endif %}{{point[0]}}</td>
+                        <td>{{point[1]}}</td>
+                    </tr>
+                {% endfor %}
+                <tr>
+                    <td colspan="2"><strong>Статистика:</strong> {{ stats[date] }}% измерений в вашей зоне</td>
+                </tr>
+            </tbody>
+        </table>
+        </br/>
+    </div>
+{% endfor%}

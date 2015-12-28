@@ -1,0 +1,6 @@
+<br/>
+<div id="chart-main" class="chart" style="width:97%; height:350px;"></div>
+
+{% for date, points in history %}
+    <div class="chart chart-container" id="chart_{{ date }}" data-id="{{ date }}" style="width:97%; height:250px;"></div>
+{% endfor %}

@@ -1,0 +1,17 @@
+application: freestyle-libre
+version: 1
+runtime: python27
+api_version: 1
+threadsafe: yes
+
+libraries:
+- name: jinja2
+  version: latest
+
+handlers:
+- url: /static/css
+  static_dir: static/css
+- url: /static/js
+  static_dir: static/js
+- url: .*
+  script: main.app

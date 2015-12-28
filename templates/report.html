@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% macro normalize_date(date) -%}
+{{ date.replace("_", "/")}}
+{%- endmacro %}
+
+{% block content %}
+    <div class="container col-md-12">
+        <div class="row">
+            <div class="form-group">
+                <div class="col-sm-6">
+                    <label for="id-date-from-select">Дата начала отчета</label>
+                    <select id="id-date-from-select" class="form-control" title="дата начала отчета">
+                        {% for date, points in history %}
+                            <option value="{{ date }}">{{ normalize_date(date) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="col-sm-6">
+                    <label for="id-date-to-select">Дата конца отчета</label>
+                    <select id="id-date-to-select" class="form-control" title="дата конца отчета">
+                        {% for date, points in history %}
+                            <option value="{{ date }}">{{ normalize_date(date) }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </div>
+        <hr/>
+
+        <ul class="nav nav-tabs" role="tablist">
+            <li role="presentation" class="active">
+                <a href="#history" aria-controls="history" role="tab" data-toggle="tab">Табличные данные</a>
+            </li>
+            <li id="charts-tab-li" role="presentation">
+                <a id="charts-tab" href="#chart" aria-controls="chart" role="tab" data-toggle="tab">Графики</a>
+            </li>
+        </ul>
+
+        <div class="tab-content">
+            <div role="tabpanel" class="tab-pane active" id="history">
+                {% include '_history.html' with context %}
+            </div>
+            <div role="tabpanel" class="tab-pane" id="chart">
+                {% include '_chart.html' with context %}
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+
+{% block js %}
+    <script type="text/javascript">
+        CHART_SERIES = {{ series }};
+        CHART_MANUAL_SERIES = {{ manual_series }};
+        CHART_DATES = {{ dates }};
+        CHART_RANGE_MIN = {{ range_min }};
+        CHART_RANGE_MAX = {{ range_max }};
+    </script>
+
+    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="/static/js/report.js"></script>
+{% endblock js %}
