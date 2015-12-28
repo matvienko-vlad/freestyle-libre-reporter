@@ -24,6 +24,21 @@ def extract_points(fobj):
         yield (datetime, float(value), manual)
 
 
+def get_last_measue(fobj):
+    reader = csv.reader(fobj, delimiter='\t')
+    for line in reader:
+        pass
+
+    try:
+        datetime = line[1]
+        record_type = line[2]
+        manual = record_type == '1'
+        value = line[4] if manual else line[3]
+        return value, datetime.split(' ')[-1]
+    except Exception:
+        return None, None
+
+
 def generate_history_data(points):
     days = defaultdict(list)
     series = defaultdict(list)

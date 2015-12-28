@@ -4,7 +4,9 @@
     <div class="vertical-center">
         <div class="container">
             <div class="row">
-                <div class="col-md-4 col-md-offset-4">
+                <div class="col-md-4"></div>
+
+                <div class="col-md-4">
                     <div class="panel panel-default">
                         <div class="panel-heading">
                             <h3 class="panel-title">Создание нового отчета</h3>
@@ -13,7 +15,7 @@
                         <div class="panel-body">
                             <form method="POST" action="/" enctype="multipart/form-data">
                                 <div class="form-group">
-                                    <input type="file" name="report" accept="text/csv,text/plain">
+                                    <input type="file" name="report" accept="text/csv,text/plain" id="id_report_input">
                                 </div>
 
                                 <div class="form-group">
@@ -30,12 +32,23 @@
 
                                 <hr/>
 
-                                <button type="submit" class="btn btn-default">Создать отчет</button>
+                                <div class="container-fluid">
+                                    <button style="width:100%;" type="button" class="btn btn-default" id="id_last_measure_button">Последний результат</button>
+                                </div>
+                                <div class="container-fluid">
+                                    <button style="width:100%;" type="submit" class="btn btn-default">Создать отчет</button>
+                                </div>
                             </form>
                         </div>
                     </div>
                 </div>
+
+                <div class="col-md-4"></div>
             </div>
         </div>
     </div>
 {% endblock content %}
+
+{% block js %}
+    <script src="/static/js/last_measure.js"></script>
+{% endblock js %}
