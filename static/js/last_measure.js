@@ -12,7 +12,7 @@
         var reportInput = $('#id_report_input'),
             reportFiles = reportInput.prop('files');
 
-        if (reportFiles.length == 0) {
+        if (!reportFiles || reportFiles.length == 0) {
             alert("Ой, а файл с отчетом не выбран");
             return;
         }
