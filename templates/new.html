@@ -13,7 +13,7 @@
                         </div>
 
                         <div class="panel-body">
-                            <form method="POST" action="/" enctype="multipart/form-data">
+                            <form method="POST" action="/" enctype="multipart/form-data" id="report-form">
                                 <div class="form-group">
                                     <input type="file" name="report" accept="text/csv,text/plain" id="id_report_input">
                                 </div>
@@ -50,5 +50,6 @@
 {% endblock content %}
 
 {% block js %}
+    <script src="/static/js/jquery.form.min.js"></script>
     <script src="/static/js/last_measure.js"></script>
 {% endblock js %}

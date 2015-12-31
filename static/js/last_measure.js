@@ -9,29 +9,20 @@
     }
 
     function onGetLastMeasureButtonClick(event) {
-        var reportInput = $('#id_report_input'),
-            reportFiles = reportInput.prop('files');
+        var files = document.getElementById('id_report_input').files;
 
-        if (!reportFiles || reportFiles.length == 0) {
+        if (!files || files.length == 0) {
             alert("Ой, а файл с отчетом не выбран");
             return;
         }
 
-        var data = new FormData();
-        data.append('report', reportFiles[0]);
-
-        $.ajax({
+        $('#report-form').ajaxSubmit({
             url: '/last-measure',
-            type: 'POST',
-            data: data,
-            cached: false,
             dataType: 'json',
-            processData: false,
-            contentType: false,
-            success: onGetLastMeasureSuccess,
-            error: onGetLastMeasureError
+            type: 'POST',
+            error: onGetLastMeasureError,
+            success: onGetLastMeasureSuccess
         });
-
     }
 
     $(document).ready(function() {
