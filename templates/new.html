@@ -1,5 +1,9 @@
 {% extends 'base.html' %}
 
+{% block head_js %}
+    <script src="/static/js/last_measure.js"></script>
+{% endblock %}
+
 {% block content %}
     <div class="vertical-center">
         <div class="container">
@@ -14,6 +18,7 @@
 
                         <div class="panel-body">
                             <form method="POST" action="/" enctype="multipart/form-data" id="report-form">
+                                <iframe id="fileIframe" name="fileIframe" style="display:none" onload="parseIframeResponse();" tabindex="-1"></iframe>
                                 <div class="form-group">
                                     <input type="file" name="report" accept="text/csv,text/plain" id="id_report_input">
                                 </div>
@@ -33,7 +38,7 @@
                                 <hr/>
 
                                 <div class="container-fluid">
-                                    <button style="width:100%;" type="button" class="btn btn-default" id="id_last_measure_button">Последний результат</button>
+                                    <button style="width:100%;" type="submit" formtarget="fileIframe" formaction="/last-measure" class="btn btn-default" id="id_last_measure_button">Последний результат</button>
                                 </div>
                                 <div class="container-fluid">
                                     <button style="width:100%;" type="submit" class="btn btn-default">Создать отчет</button>
@@ -48,8 +53,3 @@
         </div>
     </div>
 {% endblock content %}
-
-{% block js %}
-    <script src="/static/js/jquery.form.min.js"></script>
-    <script src="/static/js/last_measure.js"></script>
-{% endblock js %}

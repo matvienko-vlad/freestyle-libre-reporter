@@ -49,14 +49,12 @@ def new_report():
 
 @app.route('/last-measure', method='POST')
 def generate_report():
-    bottle.response.content_type = 'application/json'
-
     report = bottle.request.files.get('report')
     if report is None:
-        return json.dumps({'msg': u'Не выбран файл'})
+        return u'Не выбран файл'
 
     value, datetime = utils.get_last_measue(report.file)
-    return json.dumps({'msg': u'СК: %s\nВремя замера: %s' % (value, datetime)})
+    return u'СК: %s\nВремя замера: %s' % (value, datetime)
 
 
 @app.route('/', method='POST')
