@@ -1,29 +1,41 @@
-(function($) {
+(function() {
 
     window.parseIframeResponse = function() {
-        var response = $('#fileIframe').contents().find('body').text();
-        if (response == "") {
+        var iframe = document.getElementById('fileIframe');
+        if (iframe.contentDocument) {
+            iframeBody = iframe.contentDocument.getElementsByTagName('body')[0];
+        } else if (iframe.contentWindow) {
+            iframeBody = iframe.contentWindow.document.getElementsByTagName('body')[0];
+        }
+
+        if (iframeBody.innerHTML == "") {
             return;
         } else {
-            response = response.split(" ");
+            var response = iframeBody.innerHTML.split(" ");
             alert(response[0] + "\n" + response[1]);
         }
     }
 
     function onGetLastMeasureButtonClick(event) {
-        $('form').attr('action', '/last-measure').attr('target', 'fileIframe');
+        var form = document.getElementsByTagName('form')[0];
+        form.setAttribute('action', '/last-measure');
+        form.setAttribute('target', 'fileIframe');
+
         return true;
     }
 
     function onGenerateReportButtonClick(event) {
-        $('form').attr('action', '/report').attr('target', '');
+        var form = document.getElementsByTagName('form')[0];
+        form.setAttribute('action', '/report');
+        form.setAttribute('target', '');
+
         return true;
     }
 
 
-    $(document).ready(function() {
-        $('#id_last_measure_button').click(onGetLastMeasureButtonClick);
-        $('#id_generate_report_button').click(onGenerateReportButtonClick);
-    });
+    window.onload = function() {
+        document.getElementById('id_last_measure_button').onclick = onGetLastMeasureButtonClick;
+        document.getElementById('id_generate_report_button').onclick = onGenerateReportButtonClick;
+    }
 
-})(jQuery);
+})();
