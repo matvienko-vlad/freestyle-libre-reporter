@@ -48,7 +48,7 @@ def new_report():
 
 
 @app.route('/last-measure', method='POST')
-def generate_report():
+def get_last_measure():
     report = bottle.request.files.get('report')
     if report is None:
         return u'Не выбран файл'
