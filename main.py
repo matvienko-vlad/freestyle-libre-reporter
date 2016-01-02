@@ -57,7 +57,7 @@ def generate_report():
     return u'СК: %s\nВремя замера: %s' % (value, datetime)
 
 
-@app.route('/', method='POST')
+@app.route('/report', method='POST')
 def generate_report():
     new_range_min = bottle.request.forms.get('range-min')
     try:
