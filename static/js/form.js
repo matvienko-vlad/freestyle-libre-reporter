@@ -5,7 +5,8 @@
         if (response == "") {
             return;
         } else {
-            alert(response);
+            response = response.split(" ");
+            alert(response[0] + "\n" + response[1]);
         }
     }
 

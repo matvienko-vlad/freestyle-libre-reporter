@@ -54,7 +54,7 @@ def generate_report():
         return u'Не выбран файл'
 
     value, datetime = utils.get_last_measue(report.file)
-    return u'СК: %s\nВремя замера: %s' % (value, datetime)
+    return '%s %s' % (value, datetime)
 
 
 @app.route('/report', method='POST')
