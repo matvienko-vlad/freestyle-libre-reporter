@@ -16,12 +16,44 @@
         }
     }
 
-    function onGetLastMeasureButtonClick(event) {
+    function getLastMeasureOnFrontend() {
+        var reader = new FileReader();
+
+        reader.onload = function() {
+            var lines = reader.result.split('\n'),
+                lastLine = lines[lines.length-2],
+                elements = lastLine.split('\t'),
+                value = elements[3] || elements[4],
+                date = elements[1].split(' ')[1];
+
+            alert(value + '\n' + date);
+        }
+
+        reader.onerror = function() {
+            alert('Ошибка чтения файла');
+        }
+
+        var inputEl = document.getElementById('id_report_input');
+        reader.readAsText(inputEl.files[0]);
+    }
+
+    function getLastMeasureOnBackend() {
         var form = document.getElementsByTagName('form')[0];
         form.setAttribute('action', '/last-measure');
         form.setAttribute('target', 'fileIframe');
+    }
 
-        return true;
+
+    // handlers
+
+    function onGetLastMeasureButtonClick(event) {
+        if (window.FileReader) {
+            getLastMeasureOnFrontend();
+            return false;
+        } else {
+            getLastMeasureOnBackend();
+            return true;
+        }
     }
 
     function onGenerateReportButtonClick(event) {
