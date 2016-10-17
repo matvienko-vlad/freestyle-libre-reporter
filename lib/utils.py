@@ -20,6 +20,7 @@ def extract_points(fobj):
             continue
         manual = record_type == '1'
         value = line[4] if manual else line[3]
+        value = value.replace(',', '.')
 
         yield (datetime, float(value), manual)
 
