@@ -66,11 +66,11 @@
                 {
                     name: 'СК',
                     data: series,
-                    lineWidth: 1,
+                    lineWidth: 2.5,
                     marker: {
                         enabled: true,
                         radius: 2,
-                        fillColor: '#FF9999'
+                        fillColor: '#0000FF'
                     },
                     states: {
                         hover: {
@@ -86,7 +86,7 @@
                     enableMouseTracking: false,
                     marker : {
                         enabled: true,
-                        radius: 2,
+                        radius: 3.5,
                         fillColor: '#FF0000',
                         symbol: 'circle'
                     },
