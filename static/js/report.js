@@ -7,6 +7,13 @@
  * @example         datetotime("d-m-Y", "26-02-2012") return 1330207200000
  */
 
+ //TODO расчет среднего значения глюкозы за сутки
+ //TODO расчет A1c по методу DCCT
+ //TODO расчет A1c по методу IFCC
+ //TODO возможность добавлять стрелки на график с расчетом диапазона времени и изменения глюкозы
+ //TODO показывать сон на графике
+
+
 function($, undefined) {
     var renderedCharts = {};
 
@@ -46,6 +53,18 @@ function($, undefined) {
 
     function renderChart(id, date_min, date_max, series, manualSeries, notesSeries, notesSmallSeries, insulinFSeries, insulinNSeries) {
 
+ var
+    MMOLL_TO_MGDL = 18.0182;
+
+
+/**
+ * Display a temporary label on the chart
+ */
+function toast(chart, text) {
+
+
+}
+
 /**
  * Custom selection handler that selects points and cancels the default zoom behaviour
  */
@@ -53,39 +72,50 @@ function selectPointsByDrag(event) {
 
                 var text,
                     l_x, l_y,
-                    label;
+                    label,
+                    shape;
                 if (event.xAxis) {
                     // text = 'min: ' + Highcharts.numberFormat(event.xAxis[0].max - event.xAxis[0].min, 2) //+ ', max: ' + Highcharts.numberFormat(event.xAxis[0].max, 2);
-                    
-                    
+
+
 //                var label = this.renderer.label(
 //                        'x: ' + Highcharts.numberFormat(event.xAxis[0].value, 2) + ', y: ' + //Highcharts.numberFormat(event.yAxis[0].value, 2),
 //                        event.xAxis[0].axis.toPixels(event.xAxis[0].value),
 //                        event.yAxis[0].axis.toPixels(event.yAxis[0].value)
-//                    )                    
-                    
-                    
+//                    )
+
+
                 } else {
                     text = 'Selection reset';
                 }
-                
+
                 text = 'int: ' + Highcharts.dateFormat('%H:%M', event.xAxis[0].max -
-                    event.xAxis[0].min) + '<br>dif: '+Highcharts.numberFormat(event.yAxis[0].max-          
+                    event.xAxis[0].min) + '<br>dif: '+Highcharts.numberFormat(event.yAxis[0].max-
                         event.yAxis[0].min, 2);
-                
+
                 l_x = event.xAxis[0].axis.toPixels(event.xAxis[0].min);
                 l_y = event.yAxis[0].axis.toPixels(event.yAxis[0].min);
-                label = this.renderer.label(text, l_x, l_y)
+                label = this.renderer.label(text, l_x, l_y, 'rect', 1, 1, 1, 1)
                     .attr({
                         fill: Highcharts.getOptions().colors[0],
                         padding: 10,
                         r: 5,
-                        zIndex: 8
+                        zIndex: 8,
+                        allowDragX: true,
+                        allowDragY: true,
+                        events: {
+                           click: function (event) {
+                              label.fadeOut();
+                            }
+                        }
+
                     })
                     .css({
                         color: '#FFFFFF'
                     })
                     .add();
+
+                shape =
 
                 setTimeout(function () {
           //          label.fadeOut();
@@ -110,7 +140,113 @@ function selectedPoints(e) {
 function unselectByClick() {
 }
 
+function getyValue(chartObj,seriesIndex,xValue){
+    var yValue=null;
+    var points=chartObj.series[seriesIndex].points;
+    for(var i=0;i<points.length;i++){
+        if(points[i].x>xValue)
+        {
+            break;
+        }
+        else{
+            if(points[i].x==xValue)
+            {
+                yValue=points[i].y;
+                break;
+            }
+        }
+        yValue=points[i].y;
+    }
+    return yValue;
+}
 
+function getA1cDCCT(avg) {
+    var A1cDCCT = 0;
+    if (avg > 0) {
+         A1cDCCT = (avg*MMOLL_TO_MGDL + 46.7) / 28.7;
+    }
+    return A1cDCCT;
+}
+
+function getA1cIFCC(avg) {
+    var A1cIFCC = 0;
+    if (avg > 0) {
+       A1cIFCC =  ((avg*MMOLL_TO_MGDL + 46.7) / 28.7 - 2.15) * 10.929;
+    }
+    return A1cIFCC;
+}
+
+
+function getAvgGlu(chart, from, to)
+{
+    var i, len, sum_x, sum_y;
+    var series = chart.series[0];
+    var avg = 0;
+    sum_x = 0;
+    sum_y = 0;
+    len = series.data.length;
+    if (len > 2) {
+        if (from==0) {
+        }
+        for (i = 1; i < len; ++i) {
+            sum_y = sum_y
+                + (series.points[i].x-series.points[i-1].x)*(series.points[i].y+series.points[i-1].y)/2;
+            sum_x = sum_x + series.points[i].x-series.points[i-1].x;
+           //console.log(series.data[i,0]);
+        }
+        avg = sum_y/sum_x;
+    }
+    return avg;
+}
+
+function click2(event) {
+    //this.renderer.annotations.shape.add();
+
+
+     var x = Math.round(event.xAxis[0].value),
+                    y = Math.round(event.yAxis[0].value),
+               //     series = this.series['ser_data'];
+     series = this.series[0];
+     var text,
+         l_x, l_y,
+         label,
+         shape;
+
+
+
+     avg =  getAvgGlu(this);
+     text = '?'
+     if (avg > 0) {
+         text = 'Avg: ' + Highcharts.numberFormat(avg, 2) + ' mmol/L</br>'
+             + 'A1cDCCT: ' + Highcharts.numberFormat(getA1cDCCT(avg), 2) + '%' + '</br>'
+             + 'A1cIFCC: ' +  Highcharts.numberFormat(getA1cIFCC(avg), 2) + 'mmol/mol' + '</br>';
+
+     }
+     l_x = 0;
+     l_y = 9;
+     label = this.renderer.label(text, l_x, l_y, 'rect', 1, 1, 1, 1)
+                    .attr({
+                        fill: Highcharts.getOptions().colors[0],
+                        padding: 10,
+                        r: 5,
+                        zIndex: 8,
+                        allowDragX: true,
+                        allowDragY: true,
+
+
+                    })
+                    .css({
+                        color: '#FFFFFF'
+                    })
+                    .add();
+
+
+
+                // Add it
+            //    series.addPoint([x, y]);
+
+    //this.series[0].lineWidth = 10;
+}
 
 
 
@@ -118,12 +254,13 @@ function unselectByClick() {
             chart: {
                 type: 'spline',
                 borderWidth: 1,
-                zoomType: 'xy',
- 		animation: false,
+                // zoomType: 'xy',
+ 		        animation: false,
                 events: {
                     selection: selectPointsByDrag,
                     selectedpoints: selectedPoints,
-                    click: unselectByClick
+                    // click: unselectByClick
+                    click: click2
                 }
             },
 
