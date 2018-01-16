@@ -11,7 +11,7 @@
                 <div class="col-sm-6">
                     <label for="id-date-from-select">Дата начала отчета</label>
                     <select id="id-date-from-select" class="form-control" title="дата начала отчета">
-                        {% for date, points in history %}
+                         {% for date in dates_list %}
                             <option value="{{ date }}">{{ normalize_date(date) }}</option>
                         {% endfor %}
                     </select>
@@ -20,32 +20,27 @@
                 <div class="col-sm-6">
                     <label for="id-date-to-select">Дата конца отчета</label>
                     <select id="id-date-to-select" class="form-control" title="дата конца отчета">
-                        {% for date, points in history %}
+                         {% for date in dates_list %}
                             <option value="{{ date }}">{{ normalize_date(date) }}</option>
                         {% endfor %}
                     </select>
                 </div>
+
+                <div class="col-sm-6">
+                    <label for="id-date-to-select">Высота графика в пикселях</label>
+		    <input type="text" name="chart_height" class="form-control" id="id_chart_height" maxlength="4" value="{{ chart_height }}">
+                </div>
+
             </div>
         </div>
         <hr/>
 
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active">
-                <a href="#history" aria-controls="history" role="tab" data-toggle="tab">Табличные данные</a>
-            </li>
-            <li id="charts-tab-li" role="presentation">
-                <a id="charts-tab" href="#chart" aria-controls="chart" role="tab" data-toggle="tab">Графики</a>
-            </li>
-        </ul>
-
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="history">
-                {% include '_history.html' with context %}
-            </div>
-            <div role="tabpanel" class="tab-pane" id="chart">
+        <div class="row">
+            <div class="col-md-12">
                 {% include '_chart.html' with context %}
             </div>
         </div>
+
     </div>
 {% endblock content %}
 
@@ -53,11 +48,19 @@
     <script type="text/javascript">
         CHART_SERIES = {{ series }};
         CHART_MANUAL_SERIES = {{ manual_series }};
+        CHART_NOTES_SERIES = {{ notes_series }};
+        CHART_NOTES_SMALL_SERIES = {{ notes_small_series }};
+        CHART_INSULIN_F_SERIES = {{ insulin_fast_series }};
+        CHART_INSULIN_N_SERIES = {{ insulin_night_series }};
         CHART_DATES = {{ dates }};
         CHART_RANGE_MIN = {{ range_min }};
         CHART_RANGE_MAX = {{ range_max }};
+        CHART_HEIGHT_MAX = {{ chart_height }};
     </script>
 
-    <script src="http://code.highcharts.com/highcharts.js"></script>
+    <script src="https://code.highcharts.com/stock/highstock.js"></script>
+    <script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+    <script src="https://code.highcharts.com/modules/annotations.js"></script>
     <script src="/static/js/report.js"></script>
+
 {% endblock js %}
