@@ -28,14 +28,16 @@ def extract_points(fobj):
 #    c = fobj.read().decode('utf-16').encode('utf-8')
 #    reader = csv.reader(BytesIO(c), delimiter=';')
     reader = csv.reader(read_file(fobj), delimiter=';')
-
+    i = 0;
     for line in reader:
         type_data = 0
         if len(line) == 1:
             continue
         if len(line) < 13:
             continue
-
+        if i > 10000 :
+            break
+        i = i + 1
         if line[0] == 'ID':
             continue
         datetime = line[1]

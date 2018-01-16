@@ -12,6 +12,9 @@
  //TODO расчет A1c по методу IFCC
  //TODO возможность добавлять стрелки на график с расчетом диапазона времени и изменения глюкозы
  //TODO показывать сон на графике
+ //TODO рассчет суммарной дозы инсулина
+ //TODO рассчет % времени в зоне, выше зоны и ниже зоны
+ //TODO отображение на графике минимума и максимума
 
 
 function($, undefined) {
@@ -51,94 +54,11 @@ function($, undefined) {
         return new Date(Date.UTC(parts[fmt['yyyy']], parts[fmt['mm']]-1, parts[fmt['dd']]));
     }
 
-    function renderChart(id, date_min, date_max, series, manualSeries, notesSeries, notesSmallSeries, insulinFSeries, insulinNSeries) {
 
+    function renderChart(id, date_min, date_max, series, manualSeries, notesSeries, notesSmallSeries, insulinFSeries, insulinNSeries) {
+// -------------------------------------------------------------------------------------------------------------------
  var
     MMOLL_TO_MGDL = 18.0182;
-
-
-/**
- * Display a temporary label on the chart
- */
-function toast(chart, text) {
-
-
-}
-
-/**
- * Custom selection handler that selects points and cancels the default zoom behaviour
- */
-function selectPointsByDrag(event) {
-
-                var text,
-                    l_x, l_y,
-                    label,
-                    shape;
-                if (event.xAxis) {
-                    // text = 'min: ' + Highcharts.numberFormat(event.xAxis[0].max - event.xAxis[0].min, 2) //+ ', max: ' + Highcharts.numberFormat(event.xAxis[0].max, 2);
-
-
-//                var label = this.renderer.label(
-//                        'x: ' + Highcharts.numberFormat(event.xAxis[0].value, 2) + ', y: ' + //Highcharts.numberFormat(event.yAxis[0].value, 2),
-//                        event.xAxis[0].axis.toPixels(event.xAxis[0].value),
-//                        event.yAxis[0].axis.toPixels(event.yAxis[0].value)
-//                    )
-
-
-                } else {
-                    text = 'Selection reset';
-                }
-
-                text = 'int: ' + Highcharts.dateFormat('%H:%M', event.xAxis[0].max -
-                    event.xAxis[0].min) + '<br>dif: '+Highcharts.numberFormat(event.yAxis[0].max-
-                        event.yAxis[0].min, 2);
-
-                l_x = event.xAxis[0].axis.toPixels(event.xAxis[0].min);
-                l_y = event.yAxis[0].axis.toPixels(event.yAxis[0].min);
-                label = this.renderer.label(text, l_x, l_y, 'rect', 1, 1, 1, 1)
-                    .attr({
-                        fill: Highcharts.getOptions().colors[0],
-                        padding: 10,
-                        r: 5,
-                        zIndex: 8,
-                        allowDragX: true,
-                        allowDragY: true,
-                        events: {
-                           click: function (event) {
-                              label.fadeOut();
-                            }
-                        }
-
-                    })
-                    .css({
-                        color: '#FFFFFF'
-                    })
-                    .add();
-
-                shape =
-
-                setTimeout(function () {
-          //          label.fadeOut();
-                }, 1000);
-
-
-    return false; // Don't zoom
-
-}
-
-
-/**
- * The handler for a custom event, fired from selection event
- */
-function selectedPoints(e) {
-}
-
-
-/**
- * On click, unselect all points
- */
-function unselectByClick() {
-}
 
 function getyValue(chartObj,seriesIndex,xValue){
     var yValue=null;
@@ -176,37 +96,41 @@ function getA1cIFCC(avg) {
     return A1cIFCC;
 }
 
-
-function getAvgGlu(chart, from, to)
+function getAvgGlu(chart, from=0, to=0)
 {
-    var i, len, sum_x, sum_y;
+    var i, len, sum_x, sum_y, x;
     var series = chart.series[0];
     var avg = 0;
     sum_x = 0;
     sum_y = 0;
     len = series.data.length;
     if (len > 2) {
-        if (from==0) {
+        if (from == 0) {
+            for (i = 1; i < len; ++i) {
+
+                sum_y = sum_y
+                    + (series.points[i].x-series.points[i-1].x)*(series.points[i].y+series.points[i-1].y)/2;
+                sum_x = sum_x + series.points[i].x-series.points[i-1].x;
+            }
+        } else  {
+            for (i = 1; i < len; ++i) {
+                x = series.points[i].x;
+                if ((x>from) && (x<to)) {
+                    sum_y = sum_y
+                        + (series.points[i].x-series.points[i-1].x)*(series.points[i].y+series.points[i-1].y)/2;
+                    sum_x = sum_x + series.points[i].x-series.points[i-1].x;
+                }
+            }
         }
-        for (i = 1; i < len; ++i) {
-            sum_y = sum_y
-                + (series.points[i].x-series.points[i-1].x)*(series.points[i].y+series.points[i-1].y)/2;
-            sum_x = sum_x + series.points[i].x-series.points[i-1].x;
-           //console.log(series.data[i,0]);
+        if (sum_x > 0) {
+            avg = sum_y/sum_x;
         }
-        avg = sum_y/sum_x;
     }
     return avg;
 }
 
-function click2(event) {
-    //this.renderer.annotations.shape.add();
-
-
-     var x = Math.round(event.xAxis[0].value),
-                    y = Math.round(event.yAxis[0].value),
-               //     series = this.series['ser_data'];
-     series = this.series[0];
+function showStatOnSelectReg(chart, from, to) {
+     var series = chart.series[0];
      var text,
          l_x, l_y,
          label,
@@ -214,7 +138,7 @@ function click2(event) {
 
 
 
-     avg =  getAvgGlu(this);
+     avg =  getAvgGlu(chart, from, to);
      text = '?'
      if (avg > 0) {
          text = 'Avg: ' + Highcharts.numberFormat(avg, 2) + ' mmol/L</br>'
@@ -222,9 +146,9 @@ function click2(event) {
              + 'A1cIFCC: ' +  Highcharts.numberFormat(getA1cIFCC(avg), 2) + 'mmol/mol' + '</br>';
 
      }
-     l_x = 0;
-     l_y = 9;
-     label = this.renderer.label(text, l_x, l_y, 'rect', 1, 1, 1, 1)
+     l_x = 250;
+     l_y = 80;
+     label = chart.renderer.label(text, l_x, l_y, 'rect', 1, 1, 1, 1)
                     .attr({
                         fill: Highcharts.getOptions().colors[0],
                         padding: 10,
@@ -240,28 +164,75 @@ function click2(event) {
                     })
                     .add();
 
-
-
-                // Add it
-            //    series.addPoint([x, y]);
-
-    //this.series[0].lineWidth = 10;
+      setTimeout(function () {
+          label.fadeOut(); }, 3000);
 }
 
+/**
+ * Custom selection handler that selects points and cancels the default zoom behaviour
+ */
+function selectByDrag(event) {
 
+    var text,
+        l_x, l_y,
+        label,
+        shape;
+
+    if (event.xAxis) {
+        showStatOnSelectReg(this, event.xAxis[0].min, event.xAxis[0].max);
+    }
+    return false; // Don't zoom
+}
+
+function showStatOnLoad(chart) {
+     var series = chart.series[0];
+     var text,
+         l_x, l_y,
+         label,
+         shape;
+
+     avg =  getAvgGlu(chart);
+     text = '?'
+     if (avg > 0) {
+         text = 'Avg: ' + Highcharts.numberFormat(avg, 2) + ' mmol/L</br>'
+             + 'A1cDCCT: ' + Highcharts.numberFormat(getA1cDCCT(avg), 2) + '%' + '</br>'
+             + 'A1cIFCC: ' +  Highcharts.numberFormat(getA1cIFCC(avg), 2) + 'mmol/mol' + '</br>';
+
+     }
+     l_x = 60;
+     l_y = 80;
+     label = chart.renderer.label(text, l_x, l_y, 'rect', 1, 1, 1, 1)
+                    .attr({
+                        fill: Highcharts.getOptions().colors[0],
+                        padding: 10,
+                        r: 5,
+                        zIndex: 8,
+                        allowDragX: true,
+                        allowDragY: true,
+
+
+                    })
+                    .css({
+                        color: '#FFFFFF'
+                    })
+                    .add();
+}
+
+function onLoad(event) {
+    showStatOnLoad(this);
+}
 
         Highcharts.stockChart('chart_' + id, {
             chart: {
                 type: 'spline',
                 borderWidth: 1,
-                // zoomType: 'xy',
+                zoomType: 'x',
  		        animation: false,
                 events: {
-                    selection: selectPointsByDrag,
-                    selectedpoints: selectedPoints,
-                    // click: unselectByClick
-                    click: click2
+                   selection: selectByDrag,
+                   load: onLoad
                 }
+
             },
 
 	    navigator: {

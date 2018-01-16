@@ -99,7 +99,7 @@ def generate_report():
             return generate_error_reply(u'Файл не содержит данных',
                                         new_range_min, new_range_max)
 
-    dates_list = sorted(series.keys(), key=lambda (i): time.mktime(time.strptime(i, '%d_%m_%Y')))
+    dates_list = sorted(series.keys(), key=lambda (i): time.mktime(time.strptime(i, '%d_%m_%Y')), reverse = True)
 
     return get_template('report.html').render({
         'stats': stats,
